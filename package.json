@@ -39,7 +39,7 @@
   "peerDepencies": {},
   "dependencies": {
     "antd": "3.4.3",
-    "axios": "^0.16.2",
+    "axios": "^0.18.1",
     "babel-plugin-import": "^1.4.0",
     "currency-symbol-map": "^4.0.1",
     "dateformat": "^2.0.0",
