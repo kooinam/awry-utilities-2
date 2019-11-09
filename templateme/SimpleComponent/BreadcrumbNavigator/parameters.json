@@ -1,0 +1,9 @@
+{
+  "templates": {
+    "index.js": "src/components/BreadcrumbNavigator.js",
+    "styles.scss": "src/components/BreadcrumbNavigator.scss"
+  },
+  "parameters": {
+    "name": "BreadcrumbNavigator"
+  }
+}
