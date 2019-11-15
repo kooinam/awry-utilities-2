@@ -4,15 +4,19 @@ function getNetwork() {
   global = (typeof (window) === 'undefined') ? global : window;
 
   global.Network = global.Network || {
-    component: null,
+    onLoadStart: null,
+    onLoadEnd: null,
+    onUnauthorized: null,
     preferences: {},
   };
 
   return global.Network;
 }
 
-export const setupAxios = (component) => {
-  getNetwork().component = component;
+export const setupAxios = (onLoadStart, onLoadEnd, onUnauthorized) => {
+  getNetwork().onLoadStart = onLoadStart;
+  getNetwork().onLoadEnd = onLoadEnd;
+  getNetwork().onUnauthorized = onUnauthorized;
 };
 
 export const addAxiosPreferences = (key, preferences) => {
@@ -20,16 +24,21 @@ export const addAxiosPreferences = (key, preferences) => {
 };
 
 const addInterceptors = (instance) => {
-  if (getNetwork().component) {
     instance.interceptors.response.use((response) => {
-      getNetwork().component.hideLoading();
+      if (getNetwork().onLoadEnd) {
+        getNetwork().onLoadEnd();
+      }
+
       return response;
     }, (error) => {
-      getNetwork().component.hideLoading();
+      if (getNetwork().onLoadEnd) {
+        getNetwork().onLoadEnd();
+      }
+
       if (error && error.response) {
         if (error.response.status === 401) {
-          if (Network.component.unauthorized) {
-            Network.component.unauthorized();
+          if (getNetwork().unauthorized) {
+            getNetwork().unauthorized();
           }
           return Promise.reject(null);
         }
@@ -41,7 +50,6 @@ const addInterceptors = (instance) => {
 
       return Promise.reject(null);
     });
-  }
 };
 
 export const getBaseUrl = (key) => {
@@ -89,8 +97,8 @@ export const getAxios = (key) =>
     });
 
     instance.interceptors.request.use((instance) => {
-      if (getNetwork().component && getNetwork().component.showLoading) {
-        getNetwork().component.showLoading();
+      if (getNetwork().onLoadStart) {
+        getNetwork().onLoadStart();
       }
 
       getRequestInterceptors(key)(instance);
